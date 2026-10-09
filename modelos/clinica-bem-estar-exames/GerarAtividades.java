@@ -86,7 +86,9 @@ class GerarAtividades {
             fluxo(inicio,chegada); fluxo(chegada,pedido); fluxo(pedido,conferir);
             fluxo(conferir,cobertura);
             fluxo(cobertura,liberado,"convênio cobre",650,365,805,365,805,815,770,815);
-            fluxo(cobertura,informar,"convênio não cobre");
+            var naoCoberto=fluxo(cobertura,informar,"convênio não cobre");
+            naoCoberto.setProperty("name.point.x","455.0");
+            naoCoberto.setProperty("name.point.y","385.0");
             fluxo(informar,escolha,"",490,438,215,438,215,500);
             fluxo(escolha,desistir,"desistir",200,515,110,515,110,590);
             fluxo(escolha,pagar,"pagar particular",230,515,310,515,310,590);

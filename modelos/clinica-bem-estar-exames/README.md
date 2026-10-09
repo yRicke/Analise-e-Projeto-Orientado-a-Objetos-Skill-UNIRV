@@ -15,3 +15,7 @@ Após a aprovação da amostra, um fork inicia a análise laboratorial e o agend
 O pedido já foi fornecido pelo médico antes do início deste processo. A ação do paciente na consulta representa seu comparecimento; a análise conjunta está na partição do médico. O estereótipo `documento` é uma indicação descritiva, não uma exigência da notação UML.
 
 Apoio: skill `engenharia-software-apoo`, referência `references/engenharia-aplicada.md`. O modelo foi reaberto e validado pelo Astah, com conferência das responsabilidades, dos dois documentos e das entradas e saídas do fork e do join.
+
+Revisão independente com a skill `requesting-code-review` do Superpowers: nenhum problema crítico ou importante identificado. O rótulo `[convênio não cobre]` foi deslocado para não ser atravessado pela seta. Foram conferidos os caminhos de cobertura, pagamento e desistência, a repetição da coleta, a sincronização antes do laudo e a análise médica após o comparecimento e a disponibilização do documento.
+
+As referências da skill classificam diagramas de atividades como aplicação complementar; não foi localizado um capítulo específico de atividades nos slides locais examinados. A revisão segue o enunciado e a semântica UML, sem atribuir ao professor uma convenção não documentada.
