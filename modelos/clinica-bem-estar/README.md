@@ -2,7 +2,9 @@
 
 Modelo original do cenário fornecido pelo usuário, seguindo a skill `engenharia-software-apoo`, especialmente `references/diagramas-sequencia.md` e `references/fontes-e-convencoes.md`.
 
-- `agendar-consulta.asta`: projeto nativo, gerado pela API do Astah UML 12.0.0.
+- `agendar-consulta-revisado.asta`: versão corrigida do projeto nativo, gerada pela API do Astah UML 12.0.0. Use este arquivo para a entrega.
+- `agendar-consulta-revisado.png`: imagem da versão corrigida, exportada pelo próprio Astah.
+- `agendar-consulta.asta`: versão inicial, preservada porque estava aberta no Astah durante a correção.
 - `agendar-consulta.png`: imagem exportada pelo próprio Astah e conferida visualmente.
 - `GerarSequencia.java`: fonte de construção pela API instalada do Astah.
 
@@ -12,6 +14,8 @@ O fragmento `opt [paciente == null]` registra somente pacientes ainda não cadas
 
 A autorização de SMS é tratada como informação do paciente. O enunciado não descreve como ela é coletada; por isso, o modelo não acrescenta uma etapa de consentimento.
 
-O projeto foi reaberto pela API, submetido à validação de modelos do Astah e inspecionado para conferir a associação das mensagens às guardas e o caráter assíncrono do SMS. Os resultados de cadastro e agendamento são indicados na própria chamada síncrona; as consultas por CPF, especialidade e disponibilidade apresentam retornos tracejados.
+O projeto foi reaberto pela API, submetido à validação de modelos do Astah e inspecionado para conferir a associação das mensagens às guardas e o caráter assíncrono do SMS. Na versão revisada, os resultados de cadastro e agendamento também apresentam retornos tracejados. As mensagens coordenadas partem das ativações existentes do controle, prolongando suas execuções durante a identificação, o cadastro, a listagem de médicos e o agendamento. A listagem explicita todos os médicos da especialidade, com seus nomes.
+
+A correção segue a semântica de ativação e chamada síncrona dos slides 47–48 e o exemplo do slide 57 de `Aula3-APOO_I-N2.pdf` (páginas físicas 7–8 e 17). Os fragmentos são associados explicitamente às mensagens e aos participantes para manter o cadastro no `opt`, o registro no ramo disponível e o SMS no `opt` interno ao sucesso.
 
 O diagrama que estava aberto no projeto sem nome não foi alterado: o controle de computador não conseguiu capturar a janela. Este arquivo é uma entrega separada e editável no Astah.

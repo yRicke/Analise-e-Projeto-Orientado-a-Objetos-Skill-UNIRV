@@ -8,26 +8,50 @@ import com.change_vision.jude.api.inf.presentation.*;
 /** Modelo original do cenário de agendamento, construído pela API nativa do Astah. */
 class GerarSequencia {
     static SequenceDiagramEditor editor;
+    static java.util.Map<IPresentation, Double> instantes = new java.util.LinkedHashMap<>();
+    static java.util.Map<INodePresentation, Double> finais = new java.util.HashMap<>();
+    static java.util.Map<Integer, java.util.List<INodePresentation>> execucoes = new java.util.HashMap<>();
     static INodePresentation[] participantes = new INodePresentation[7];
 
     static ILinkPresentation mensagem(int origem, int destino, String nome, double y) throws Exception {
         int inicio = nome.indexOf('(');
         String operacao = inicio < 0 ? nome : nome.substring(0, inicio);
         String argumentos = inicio < 0 ? "" : nome.substring(inicio + 1, nome.length() - 1);
-        ILinkPresentation seta = editor.createMessage(operacao, participantes[origem], participantes[destino], y);
+        ILinkPresentation seta = editor.createMessage(operacao, origemAtiva(origem, y), participantes[destino], y);
         ((IMessage)seta.getModel()).setArgument(argumentos);
+        instantes.put(seta, y);
+        execucoes.get(origem).add(seta.getSource());
+        execucoes.get(destino).add(seta.getTarget());
         return seta;
     }
-    static void retorno(ILinkPresentation chamada, String nome) throws Exception {
-        editor.createReturnMessage(nome, chamada);
+    // Reutiliza a execução emissora em vez de criar barras isoladas para cada chamada.
+    static INodePresentation origemAtiva(int indice, double y) {
+        for (int i = execucoes.get(indice).size() - 1; i >= 0; i--) {
+            INodePresentation barra = execucoes.get(indice).get(i);
+            var r = barra.getRectangle();
+            if (r.getY() <= y && finais.getOrDefault(barra, r.getMaxY()) > y) return barra;
+        }
+        return participantes[indice];
     }
-    static INodePresentation fragmento(String operador, String guarda, double x, double y,
-                                      double largura, double altura) throws Exception {
-        INodePresentation quadro = editor.createCombinedFragment("", operador,
-            new Point2D.Double(x, y), largura, altura);
-        ((ICombinedFragment) quadro.getModel()).getInteractionOperands()[0].setGuard(guarda);
-        quadro.setProperty("auto_resize", "false");
-        return quadro;
+    static ILinkPresentation executar(ILinkPresentation chamada, double fim) throws Exception {
+        var barra = chamada.getTarget();
+        finais.put(barra, fim);
+        return chamada;
+    }
+    static void retorno(ILinkPresentation chamada, String nome) throws Exception {
+        var resposta = editor.createReturnMessage(nome, chamada);
+        instantes.put(resposta, instantes.get(chamada) + 25);
+    }
+    static IPresentation[] trecho(double inicio, double fim) {
+        return instantes.entrySet().stream().filter(e -> e.getValue() >= inicio && e.getValue() < fim)
+            .map(java.util.Map.Entry::getKey).toArray(IPresentation[]::new);
+    }
+    static INodePresentation quadro(String operador, String guarda, IPresentation[] mensagens, int... vidas) throws Exception {
+        java.util.List<IPresentation> alvos = new java.util.ArrayList<>(java.util.Arrays.asList(mensagens));
+        for (int vida : vidas) alvos.add(participantes[vida]);
+        var resultado = editor.createCombinedFragment(operador, alvos.toArray(IPresentation[]::new));
+        ((ICombinedFragment)resultado.getModel()).getInteractionOperands()[0].setGuard(guarda);
+        return resultado;
     }
     public static void main(String[] args) throws Exception {
         var projeto = AstahAPI.getAstahAPI().getProjectAccessor();
@@ -48,39 +72,45 @@ class GerarSequencia {
                 IClass tipo = i==0 ? ModelEditorFactory.getUseCaseModelEditor().createActor(raiz, classes[i])
                     : modelos.createClass(raiz, classes[i]);
                 if (!estereotipos[i].isEmpty()) tipo.addStereotype(estereotipos[i]);
+                execucoes.put(i, new java.util.ArrayList<>());
                 participantes[i] = editor.createLifeline(instancias[i], x[i]);
                 ((ILifeline)participantes[i].getModel()).setBase(tipo);
                 participantes[i].setProperty("lifeline_length", "2400");
             }
-            mensagem(0,1,"informarCPF(cpf)",140);
-            mensagem(1,2,"identificarPaciente(cpf)",200);
+            executar(mensagem(0,1,"informarCPF(cpf)",140), 790);
+            executar(mensagem(1,2,"identificarPaciente(cpf)",200), 780);
             retorno(mensagem(2,3,"buscarPorCPF(cpf)",260),"paciente ou null");
-            fragmento("opt", "paciente == null",20,300,1510,380);
-            mensagem(2,1,"solicitarDadosPaciente()",405);
+            executar(mensagem(2,1,"solicitarDadosPaciente()",405), 500);
             mensagem(1,0,"exibirFormularioCadastro()",465);
-            mensagem(0,1,"informarDados(nome, telefone, dataNascimento)",525);
-            mensagem(1,2,"cadastrarPaciente(cpf, nome, telefone, dataNascimento)",585);
-            ((IMessage)mensagem(2,3,"registrarPaciente(cpf, nome, telefone, dataNascimento)",645).getModel()).setReturnValue("paciente registrado");
-            mensagem(0,1,"selecionarEspecialidade(especialidade)",805);
-            mensagem(1,2,"listarMedicos(especialidade)",865);
-            retorno(mensagem(2,4,"buscarPorEspecialidade(especialidade)",925),"medicos com seus nomes");
-            mensagem(2,1,"apresentarMedicos(medicos)",1030);
+            executar(mensagem(0,1,"informarDados(nome, telefone, dataNascimento)",525), 745);
+            executar(mensagem(1,2,"cadastrarPaciente(cpf, nome, telefone, dataNascimento)",585), 735);
+            retorno(mensagem(2,3,"registrarPaciente(cpf, nome, telefone, dataNascimento)",645), "paciente registrado");
+            executar(mensagem(0,1,"selecionarEspecialidade(especialidade)",805), 1140);
+            executar(mensagem(1,2,"listarMedicos(especialidade)",865), 1130);
+            retorno(mensagem(2,4,"buscarPorEspecialidade(especialidade)",925),"todos os medicos da especialidade, com seus nomes");
+            executar(mensagem(2,1,"apresentarMedicos(medicos)",1030), 1120);
             mensagem(1,0,"exibirNomesDosMedicos(medicos)",1090);
             mensagem(0,1,"selecionarMedico(medico)",1150);
-            mensagem(0,1,"informarDataHorario(data, horario)",1210);
-            mensagem(1,2,"agendarConsulta(paciente, medico, data, horario)",1270);
+            executar(mensagem(0,1,"informarDataHorario(data, horario)",1210), 2260);
+            executar(mensagem(1,2,"agendarConsulta(paciente, medico, data, horario)",1270), 2240);
             retorno(mensagem(2,5,"verificarDisponibilidade(medico, data, horario)",1330),"disponivel : boolean");
-            INodePresentation alternativas = fragmento("alt","disponivel",20,1410,2600,800);
-            ((ICombinedFragment)alternativas.getModel()).addInteractionOperand("","else");
-            alternativas.setProperty("operand.1.length", "540");
-            ((IMessage)mensagem(2,5,"registrarConsulta(paciente, medico, data, horario)",1485).getModel()).setReturnValue("consulta registrada");
-            mensagem(2,1,"confirmarAgendamento(consulta)",1590);
+            retorno(mensagem(2,5,"registrarConsulta(paciente, medico, data, horario)",1485), "consulta registrada");
+            executar(mensagem(2,1,"confirmarAgendamento(consulta)",1590), 1690);
             mensagem(1,0,"exibirConfirmacao(paciente, medico, data, horario)",1650);
-            fragmento("opt","consulta registrada e paciente.autorizouSMS",800,1710,1780,180);
             ILinkPresentation envio = mensagem(2,6,"enviarLembreteSMS(paciente.telefone, consulta)",1820);
             ((IMessage)envio.getModel()).setAsynchronous(true);
-            mensagem(2,1,"informarHorarioOcupado()",2020);
+            executar(mensagem(2,1,"informarHorarioOcupado()",2020), 2120);
             mensagem(1,0,"exibirHorarioOcupado()",2080);
+            quadro("opt", "paciente == null", trecho(300,760), 0,1,2,3);
+            INodePresentation lembrete = quadro("opt", "consulta registrada e paciente.autorizouSMS", trecho(1710,1890), 2,6);
+            var ramos = new java.util.ArrayList<IPresentation>(java.util.Arrays.asList(trecho(1410,2210)));
+            ramos.removeAll(java.util.Arrays.asList(trecho(1710,1890)));
+            ramos.add(lembrete);
+            INodePresentation alternativas = quadro("alt", "disponivel", ramos.toArray(IPresentation[]::new), 0,1,2,5,6);
+            editor.addInteractionOperand(alternativas, trecho(1950,2210), "", "else");
+            var sucesso = new java.util.ArrayList<IPresentation>(java.util.Arrays.asList(trecho(1410,1710)));
+            sucesso.add(lembrete);
+            editor.setInteractionOperandTargets(alternativas, new IPresentation[][] {sucesso.toArray(IPresentation[]::new), trecho(1950,2210)});
             editor.createNote("SMS assíncrono: a recepcionista não aguarda o envio.\nA autorização é uma informação do paciente;\na coleta desse consentimento não é descrita no cenário.",new Point2D.Double(1730,2280));
             TransactionManager.endTransaction();
             projeto.save();
