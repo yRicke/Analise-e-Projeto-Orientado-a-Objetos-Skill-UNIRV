@@ -2,10 +2,8 @@
 
 Modelo original do cenário fornecido pelo usuário, seguindo a skill `engenharia-software-apoo`, especialmente `references/diagramas-sequencia.md` e `references/fontes-e-convencoes.md`.
 
-- `agendar-consulta-revisado.asta`: versão corrigida do projeto nativo, gerada pela API do Astah UML 12.0.0. Use este arquivo para a entrega.
-- `agendar-consulta-revisado.png`: imagem da versão corrigida, exportada pelo próprio Astah.
-- `agendar-consulta.asta`: versão inicial, preservada porque estava aberta no Astah durante a correção.
-- `agendar-consulta.png`: imagem exportada pelo próprio Astah e conferida visualmente.
+- `agendar-consulta.asta`: versão revisada do projeto nativo, gerada pela API do Astah UML 12.0.0.
+- `agendar-consulta.png`: imagem da versão revisada, exportada pelo próprio Astah e conferida visualmente.
 - `GerarSequencia.java`: fonte de construção pela API instalada do Astah.
 
 A recepcionista interage com a tela, que delega ao controle. O controle consulta o cadastro de pacientes, o corpo clínico e a agenda de consultas. O serviço de SMS recebe uma mensagem assíncrona.
@@ -18,4 +16,4 @@ O projeto foi reaberto pela API, submetido à validação de modelos do Astah e 
 
 A correção segue a semântica de ativação e chamada síncrona dos slides 47–48 e o exemplo do slide 57 de `Aula3-APOO_I-N2.pdf` (páginas físicas 7–8 e 17). Os fragmentos são associados explicitamente às mensagens e aos participantes para manter o cadastro no `opt`, o registro no ramo disponível e o SMS no `opt` interno ao sucesso.
 
-O diagrama que estava aberto no projeto sem nome não foi alterado: o controle de computador não conseguiu capturar a janela. Este arquivo é uma entrega separada e editável no Astah.
+A pasta mantém somente a versão revisada do modelo, com o nome `agendar-consulta`.
