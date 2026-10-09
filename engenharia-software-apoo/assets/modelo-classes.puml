@@ -1,0 +1,37 @@
+@startuml
+title Exemplo próprio — Modelo de projeto de reserva
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+class Solicitante {
+  - nome : String
+}
+class Reserva {
+  - status : StatusReserva
+  + adicionarItem(equipamento : Equipamento, inicio : DateTime, fim : DateTime) : void
+  + confirmar() : void
+  + cancelar() : void
+}
+class ItemReserva {
+  - inicio : DateTime
+  - fim : DateTime
+  + verificarPeriodo() : boolean
+}
+class Equipamento {
+  - codigo : String
+  + disponivel(inicio : DateTime, fim : DateTime) : boolean
+}
+enum StatusReserva {
+  EmElaboracao
+  Confirmada
+  Cancelada
+}
+Solicitante "1" -- "0..*" Reserva : realiza
+Reserva "1" *-- "0..*" ItemReserva : contém
+ItemReserva "0..*" -- "1" Equipamento : identifica
+note bottom of Reserva
+  Hipótese deste exemplo:
+  uma reserva em elaboração pode estar vazia;
+  para confirmar, precisa de ao menos um item disponível.
+  Cada item pertence a uma única reserva.
+end note
+@enduml

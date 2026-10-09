@@ -1,0 +1,17 @@
+@startuml
+title Exemplo complementar — Estados da reserva
+hide empty description
+state "Em elaboração" as Elaboracao
+state Confirmada
+state Cancelada
+[*] --> Elaboracao : criarReserva
+Elaboracao --> Confirmada : confirmar [há itens e todos disponíveis]
+Elaboracao --> Cancelada : cancelar
+Confirmada --> Cancelada : cancelar [cancelamento permitido]
+Cancelada --> [*]
+note bottom of Confirmada
+  Hipótese do exemplo: uma reserva confirmada
+  pode ser cancelada quando a regra do domínio permitir.
+  A política exata precisa vir do enunciado.
+end note
+@enduml

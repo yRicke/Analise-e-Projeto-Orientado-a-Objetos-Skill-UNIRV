@@ -1,0 +1,21 @@
+@startuml
+title Exemplo próprio — Reserva de equipamento
+left to right direction
+skinparam shadowing false
+actor Solicitante
+actor "Serviço de Cobertura" as Cobertura
+rectangle "Sistema de Reservas" {
+  usecase "Reservar Equipamento" as Reservar
+  usecase "Verificar Disponibilidade" as Verificar
+  usecase "Adicionar Seguro" as Seguro
+}
+Solicitante -- Reservar
+Solicitante -- Seguro
+Reservar ..> Verificar : <<include>>
+Seguro ..> Reservar : <<extend>>\n[solicitante escolhe cobertura]
+Cobertura -- Seguro
+note bottom of Reservar
+  Ponto de extensão: antes da confirmação.
+  A reserva pode ser concluída sem seguro.
+end note
+@enduml

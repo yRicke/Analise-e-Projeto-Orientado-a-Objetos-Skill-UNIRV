@@ -1,0 +1,29 @@
+@startuml
+title Exemplo próprio — Verificar disponibilidade
+hide footbox
+actor Solicitante
+boundary "tela : TelaReserva" as Tela
+control "controle : ControleReserva" as Controle
+entity "equipamento : Equipamento" as Equipamento
+Solicitante -> Tela : informarPeriodo(inicio, fim)
+activate Tela
+Tela -> Controle : verificarDisponibilidade(inicio, fim)
+activate Controle
+Controle -> Equipamento : disponivel(inicio, fim)
+activate Equipamento
+Equipamento --> Controle : disponivel : boolean
+deactivate Equipamento
+alt [disponivel]
+  Controle -> Tela : exibirDisponibilidade()
+else [indisponivel]
+  Controle -> Tela : informarIndisponibilidade()
+end
+Controle --> Tela : consultaConcluida
+deactivate Controle
+Tela --> Solicitante : resultado da consulta
+deactivate Tela
+note over Controle, Equipamento
+  A consulta não confirma nem cria uma reserva.
+  A operação disponivel existe no modelo de projeto.
+end note
+@enduml

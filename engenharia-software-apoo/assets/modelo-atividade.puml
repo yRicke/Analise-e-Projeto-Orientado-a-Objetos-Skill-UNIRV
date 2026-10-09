@@ -1,0 +1,17 @@
+@startuml
+title Exemplo complementar — Confirmar reserva
+start
+:Solicitar confirmação;
+if (Reserva possui itens?) then (sim)
+  :Verificar disponibilidade dos itens;
+  if (Todos disponíveis?) then (sim)
+    :Confirmar reserva;
+    :Exibir confirmação;
+  else (não)
+    :Informar indisponibilidade;
+  endif
+else (não)
+  :Informar que a reserva precisa de itens;
+endif
+stop
+@enduml

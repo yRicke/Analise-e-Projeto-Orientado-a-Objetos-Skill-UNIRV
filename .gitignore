@@ -1,0 +1,12 @@
+# Materiais originais de uso acadêmico local
+/*.pdf
+
+# Extrações, ferramentas e resultados temporários
+/tmp/
+/output/
+*.zip
+__pycache__/
+*.pyc
+.env
+.env.*
+!.env.example

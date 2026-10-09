@@ -1,0 +1,4 @@
+interface:
+  display_name: "Engenharia de Software — APOO"
+  short_description: "Atividades, casos de uso e diagramas UML de APOO"
+  default_prompt: "Use $engenharia-software-apoo para resolver esta atividade e produzir os diagramas necessários com base nos materiais da disciplina."
